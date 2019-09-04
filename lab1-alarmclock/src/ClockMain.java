@@ -13,24 +13,23 @@ public class ClockMain {
 
         ClockInput  in  = emulator.getInput();
         ClockOutput out = emulator.getOutput();
-        clockTicker ct = new clockTicker(out);
-        Thread clockCounter = new Thread(ct);
-        clockCounter.start();
+        
 
         out.displayTime(1337);   // arbitrary time: just an example
 
         Semaphore sem = in.getSemaphore();
-
+        Semaphore updateTime = new Semaphore(1);
+        clockTicker ct = new clockTicker(out, updateTime, in);
+        Thread clockCounter = new Thread(ct);
+        clockCounter.start();
+        
         while (true) {
-            sem.acquire();                        // wait for user input
-
+            sem.acquire();                       // wait for user input
             UserInput userInput = in.getUserInput();
             int choice = userInput.getChoice();
             int value = userInput.getValue();
 
             System.out.println("choice = " + choice + "  value=" + value);
-
         }
-       
     }
 }
