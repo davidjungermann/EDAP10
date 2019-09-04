@@ -3,6 +3,7 @@ import java.util.concurrent.Semaphore;
 import clock.ClockInput;
 import clock.ClockInput.UserInput;
 import clock.ClockOutput;
+import clock.clockTicker;
 import emulator.AlarmClockEmulator;
 
 public class ClockMain {
@@ -12,6 +13,9 @@ public class ClockMain {
 
         ClockInput  in  = emulator.getInput();
         ClockOutput out = emulator.getOutput();
+        clockTicker ct = new clockTicker(out);
+        Thread clockCounter = new Thread(ct);
+        clockCounter.start();
 
         out.displayTime(1337);   // arbitrary time: just an example
 
@@ -25,6 +29,8 @@ public class ClockMain {
             int value = userInput.getValue();
 
             System.out.println("choice = " + choice + "  value=" + value);
+
         }
+       
     }
 }
