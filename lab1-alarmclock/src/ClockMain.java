@@ -3,7 +3,7 @@ import java.util.concurrent.Semaphore;
 import clock.ClockInput;
 import clock.ClockInput.UserInput;
 import clock.ClockOutput;
-import clock.clockTicker;
+import clock.ClockTicker;
 import emulator.AlarmClockEmulator;
 
 public class ClockMain {
@@ -18,8 +18,8 @@ public class ClockMain {
         out.displayTime(1337);   // arbitrary time: just an example
 
         Semaphore sem = in.getSemaphore();
-        Semaphore updateTime = new Semaphore(1);
-        clockTicker ct = new clockTicker(out, updateTime, in);
+        Semaphore mutex = new Semaphore(1);
+        ClockTicker ct = new ClockTicker(out, in, mutex);
         Thread clockCounter = new Thread(ct);
         clockCounter.start();
         
