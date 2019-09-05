@@ -8,7 +8,6 @@ public class ClockTicker implements Runnable {
 	private ClockOutput out;
 	private Semaphore mutex;
 	private ClockInput in;
-	private long TimeDiff;
 
 	public ClockTicker(ClockOutput out, ClockInput in, Semaphore mutex) {
 		this.in = in;
@@ -26,20 +25,21 @@ public class ClockTicker implements Runnable {
 		long sleepTime;
 
 		while (true) {
-			String timer = LocalTime.now().toString().replace(":", "");
-			timer = timer.substring(0, timer.indexOf("."));
+			String timeValue = LocalTime.now().toString().replace(":", "");
+			timeValue = timeValue.substring(0, timeValue.indexOf("."));
 			try {
 				mutex.acquire();
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
+
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-			out.displayTime((Integer.parseInt(timer)));
+			out.displayTime((Integer.parseInt(timeValue)));
 			mutex.release();
 			sleepTime = (intervalTime - (System.currentTimeMillis() - startTime) % intervalTime);
 			try {
 				Thread.sleep(sleepTime);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
 			}
 		}
 
