@@ -22,7 +22,7 @@ public class ClockTicker implements Runnable {
 
 	public void run() {
 		long intervalTime = 1000;
-		long t0 = System.currentTimeMillis();
+		long startTime = System.currentTimeMillis();
 		long sleepTime;
 
 		while (true) {
@@ -35,7 +35,7 @@ public class ClockTicker implements Runnable {
 			}
 			out.displayTime((Integer.parseInt(timer)));
 			mutex.release();
-			sleepTime = (intervalTime - (System.currentTimeMillis() - t0) % intervalTime);
+			sleepTime = (intervalTime - (System.currentTimeMillis() - startTime) % intervalTime);
 			try {
 				Thread.sleep(sleepTime);
 			} catch (InterruptedException e) {
