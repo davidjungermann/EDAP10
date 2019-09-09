@@ -44,6 +44,9 @@ public class ClockTicker implements Runnable {
 				e.printStackTrace();
 			}
 			String timeValue = time.toString().replace(":", "");
+			if(timeValue.length() == 4){
+				timeValue = timeValue + "00";
+			}
 			if(timeValue.contains(".")){
 				
 				timeValue = timeValue.substring(0, timeValue.indexOf("."));
