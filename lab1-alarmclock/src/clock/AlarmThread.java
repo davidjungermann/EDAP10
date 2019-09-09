@@ -14,14 +14,11 @@ public class AlarmThread implements Runnable{
 	
 	public void run() {
 		while (true){
-			
 			try {
-				System.out.println("jtajtaj");
 				alarmTrigger.acquire();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			System.out.println("NufunkarDet");
 			out.alarm();
 		}
 	}

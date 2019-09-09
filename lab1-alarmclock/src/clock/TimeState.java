@@ -8,15 +8,14 @@ public class TimeState {
 	private LocalTime time;
 	private LocalTime alarmTime;
 	private boolean alarmOn;
-
-	Semaphore mutex;
+	private boolean alarmSounding;
+	private Semaphore mutex;
 
 	public TimeState(Semaphore mutex) {
 		this.mutex = mutex;
 		time = LocalTime.now();
 
 	}
-
 	public void setTime(LocalTime time) {
 		try {
 			mutex.acquire();
@@ -78,6 +77,13 @@ public class TimeState {
 		boolean alarmOn = this.alarmOn;
 		mutex.release();
 		return alarmOn;
+	}
+	
+	public boolean alarmSounding(){
+		return alarmSounding;
+	}
+	public void setAlarmSounding(boolean bool){
+		alarmSounding = bool;
 	}
 
 }

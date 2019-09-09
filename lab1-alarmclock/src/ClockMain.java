@@ -5,7 +5,7 @@ import clock.AlarmThread;
 import clock.ClockInput;
 import clock.ClockInput.UserInput;
 import clock.ClockOutput;
-import clock.ClockTicker;
+import clock.ClockThread;
 import clock.TimeState;
 import emulator.AlarmClockEmulator;
 
@@ -19,9 +19,8 @@ public class ClockMain {
 		Semaphore mutex = new Semaphore(1);
 		Semaphore alarmTrigger = new Semaphore(0);
 		TimeState timeState = new TimeState(mutex);
-		ClockTicker ct = new ClockTicker(out, timeState, alarmTrigger);
+		ClockThread ct = new ClockThread(out, timeState, alarmTrigger);
 		Thread clockCounter = new Thread(ct);
-		
 		AlarmThread at = new AlarmThread(alarmTrigger, out);
 		Thread alarmThread = new Thread(at);
 		alarmThread.start();
@@ -45,7 +44,13 @@ public class ClockMain {
 			if (choice == 2 && value != 999999) {
 				timeState.setAlarmTime(LocalTime.of(hh, mm, ss));
 			}
-			System.out.println("choice = " + choice + " value=" + value);
+			if (choice == 3) {
+				timeState.toggleAlarm();
+				out.setAlarmIndicator(timeState.isAlarmOn());
+			}
+			if(timeState.alarmSounding() && choice != 0){
+				timeState.setAlarmSounding(false);
+			}
 		}
 	}
 }
