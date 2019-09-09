@@ -18,8 +18,9 @@ public class ClockMain {
 
 		Semaphore sem = in.getSemaphore();
 		Semaphore mutex = new Semaphore(1);
+		Semaphore alarmTrigger = new Semaphore(0);
 		TimeState timeState = new TimeState(mutex);
-		ClockTicker ct = new ClockTicker(out, in, mutex, timeState);
+		ClockTicker ct = new ClockTicker(out, timeState, alarmTrigger);
 		Thread clockCounter = new Thread(ct);
 		clockCounter.start();
 

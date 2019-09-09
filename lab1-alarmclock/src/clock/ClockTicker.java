@@ -6,19 +6,17 @@ import java.util.concurrent.Semaphore;
 public class ClockTicker implements Runnable {
 
 	private ClockOutput out;
-	private Semaphore mutex;
-	private ClockInput in;
 	private TimeState timeState;
+	private Semaphore alarmTrigger;
+	private int alarmTime;
+	private boolean alarmOn;
 	
-	public ClockTicker(ClockOutput out, ClockInput in, Semaphore mutex, TimeState timeState) {
-		this.in = in;
+	public ClockTicker(ClockOutput out, TimeState timeState, Semaphore alarmTrigger) {
 		this.out = out;
-		this.mutex = mutex;
 		this.timeState = timeState;
-	}
-
-	public ClockTicker() {
-
+		this.alarmTrigger = alarmTrigger;
+		alarmOn = false;
+		alarmTime = 20;
 	}
 	
 
@@ -26,8 +24,8 @@ public class ClockTicker implements Runnable {
 		long intervalTime = 1000;
 		long startTime = System.currentTimeMillis();
 		long sleepTime;
+		int alarmTick = 0;
 		while (true) {
-			
 			sleepTime = (intervalTime - (System.currentTimeMillis() - startTime) % intervalTime);
 			try {
 				Thread.sleep(sleepTime);
@@ -40,8 +38,16 @@ public class ClockTicker implements Runnable {
 				timeValue = timeValue.substring(0, timeValue.indexOf("."));
 			}
 
-				out.displayTime((Integer.parseInt(timeValue)));
-				timeState.setTime(timeState.getTime().plusSeconds(1));
+			out.displayTime((Integer.parseInt(timeValue)));
+			
+			if (timeState.getTime().compareTo(timeState.getAlarmTime()) == 0 || alarmOn && alarmTick < alarmTime) {
+				alarmOn = true;
+				alarmTick ++;
+				alarmTrigger.release();
+			} else if (alarmTick == alarmTime){
+				alarmOn = false;
+			}
+			timeState.setTime(timeState.getTime().plusSeconds(1));
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
