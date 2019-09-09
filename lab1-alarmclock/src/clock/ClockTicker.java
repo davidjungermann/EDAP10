@@ -8,28 +8,19 @@ public class ClockTicker implements Runnable {
 	private ClockOutput out;
 	private Semaphore mutex;
 	private ClockInput in;
-	private LocalTime time;
+	private TimeState timeState;
 	
-	public ClockTicker(ClockOutput out, ClockInput in, Semaphore mutex, LocalTime time) {
+	public ClockTicker(ClockOutput out, ClockInput in, Semaphore mutex, TimeState timeState) {
 		this.in = in;
 		this.out = out;
 		this.mutex = mutex;
-		this.time = time;
+		this.timeState = timeState;
 	}
 
 	public ClockTicker() {
 
 	}
 	
-	public void setTime(LocalTime time){
-		try {
-			mutex.acquire();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		this.time = time;
-		mutex.release();
-	}
 
 	public void run() {
 		long intervalTime = 1000;
@@ -37,13 +28,10 @@ public class ClockTicker implements Runnable {
 		long sleepTime;
 		while (true) {
 			
+			sleepTime = (intervalTime - (System.currentTimeMillis() - startTime) % intervalTime);
 			try {
-				mutex.acquire();
-				
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			String timeValue = time.toString().replace(":", "");
+				Thread.sleep(sleepTime);
+			String timeValue = timeState.getTime().toString().replace(":", "");
 			if(timeValue.length() == 4){
 				timeValue = timeValue + "00";
 			}
@@ -51,12 +39,9 @@ public class ClockTicker implements Runnable {
 				
 				timeValue = timeValue.substring(0, timeValue.indexOf("."));
 			}
-			mutex.release();
-			sleepTime = (intervalTime - (System.currentTimeMillis() - startTime) % intervalTime);
-			try {
-				Thread.sleep(sleepTime);
+
 				out.displayTime((Integer.parseInt(timeValue)));
-				time = time.plusSeconds(1);	
+				timeState.setTime(timeState.getTime().plusSeconds(1));
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
