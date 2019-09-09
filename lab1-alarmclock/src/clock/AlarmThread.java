@@ -13,13 +13,17 @@ public class AlarmThread implements Runnable{
 	
 	
 	public void run() {
-		
-		try {
-			alarmTrigger.acquire();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		while (true){
+			
+			try {
+				System.out.println("jtajtaj");
+				alarmTrigger.acquire();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			System.out.println("NufunkarDet");
+			out.alarm();
 		}
-		out.alarm();
 	}
 
 }

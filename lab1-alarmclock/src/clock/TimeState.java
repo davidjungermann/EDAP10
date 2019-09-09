@@ -23,7 +23,7 @@ public class TimeState {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		this.time = time;
+		this.time = time.withNano(00);
 		mutex.release();
 	}
 

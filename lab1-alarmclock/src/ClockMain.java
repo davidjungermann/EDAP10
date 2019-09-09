@@ -1,6 +1,7 @@
 import java.time.LocalTime;
 import java.util.concurrent.Semaphore;
 
+import clock.AlarmThread;
 import clock.ClockInput;
 import clock.ClockInput.UserInput;
 import clock.ClockOutput;
@@ -20,6 +21,10 @@ public class ClockMain {
 		TimeState timeState = new TimeState(mutex);
 		ClockTicker ct = new ClockTicker(out, timeState, alarmTrigger);
 		Thread clockCounter = new Thread(ct);
+		
+		AlarmThread at = new AlarmThread(alarmTrigger, out);
+		Thread alarmThread = new Thread(at);
+		alarmThread.start();
 		clockCounter.start();
 
 		while (true) {

@@ -39,12 +39,16 @@ public class ClockTicker implements Runnable {
 
 			out.displayTime((Integer.parseInt(timeValue)));
 			
-			if (timeState.getTime().compareTo(timeState.getAlarmTime()) == 0 || alarmOn && alarmTick < alarmTime) {
+			System.out.println(timeState.getAlarmTime());
+			System.out.println(timeState.getTime());
+			
+			if (timeState.getAlarmTime() != null && ((timeState.getTime().compareTo(timeState.getAlarmTime()) == 0 || alarmOn) && alarmTick <= alarmTime)) {
 				alarmOn = true;
 				alarmTick ++;
 				alarmTrigger.release();
-			} else if (alarmTick == alarmTime){
+			} else if (alarmTick == alarmTime) {
 				alarmOn = false;
+				alarmTick = 0;
 			}
 			timeState.setTime(timeState.getTime().plusSeconds(1));
 			} catch (InterruptedException e1) {
