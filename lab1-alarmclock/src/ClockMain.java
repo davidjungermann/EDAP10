@@ -21,15 +21,16 @@ public class ClockMain {
         Semaphore updateTime = new Semaphore(1);
         clockTicker ct = new clockTicker(out, updateTime, in);
         Thread clockCounter = new Thread(ct);
-        clockCounter.start();
+        //clockCounter.start();
         
         while (true) {
             sem.acquire();                       // wait for user input
             UserInput userInput = in.getUserInput();
             int choice = userInput.getChoice();
             int value = userInput.getValue();
-
+            int i = 0244;
             System.out.println("choice = " + choice + "  value=" + value);
+            System.out.println(i);
         }
     }
 }
