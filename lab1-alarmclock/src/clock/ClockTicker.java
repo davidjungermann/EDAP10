@@ -1,6 +1,5 @@
 package clock;
 
-import java.time.LocalTime;
 import java.util.concurrent.Semaphore;
 
 public class ClockTicker implements Runnable {
@@ -51,7 +50,7 @@ public class ClockTicker implements Runnable {
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
-			
+
 		}
 
 	}

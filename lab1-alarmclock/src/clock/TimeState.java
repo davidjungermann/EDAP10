@@ -4,19 +4,20 @@ import java.time.LocalTime;
 import java.util.concurrent.Semaphore;
 
 public class TimeState {
-	
+
 	private LocalTime time;
 	private LocalTime alarmTime;
 	private boolean alarmOn;
-	
+
 	Semaphore mutex;
-	public TimeState(Semaphore mutex){
+
+	public TimeState(Semaphore mutex) {
 		this.mutex = mutex;
 		time = LocalTime.now();
-		
+
 	}
 
-	public void setTime(LocalTime time){
+	public void setTime(LocalTime time) {
 		try {
 			mutex.acquire();
 		} catch (InterruptedException e) {
@@ -25,8 +26,8 @@ public class TimeState {
 		this.time = time;
 		mutex.release();
 	}
-	
-	public LocalTime getTime(){
+
+	public LocalTime getTime() {
 		try {
 			mutex.acquire();
 		} catch (InterruptedException e) {
@@ -36,8 +37,8 @@ public class TimeState {
 		mutex.release();
 		return time;
 	}
-	
-	public void setAlarmTime(LocalTime time){
+
+	public void setAlarmTime(LocalTime time) {
 		try {
 			mutex.acquire();
 		} catch (InterruptedException e) {
@@ -46,8 +47,8 @@ public class TimeState {
 		this.alarmTime = time;
 		mutex.release();
 	}
-	
-	public LocalTime getAlarmTime(){
+
+	public LocalTime getAlarmTime() {
 		try {
 			mutex.acquire();
 		} catch (InterruptedException e) {
@@ -57,8 +58,8 @@ public class TimeState {
 		mutex.release();
 		return time;
 	}
-	
-	public void toggleAlarm(){
+
+	public void toggleAlarm() {
 		try {
 			mutex.acquire();
 		} catch (InterruptedException e) {
@@ -67,8 +68,8 @@ public class TimeState {
 		this.alarmOn = !alarmOn;
 		mutex.release();
 	}
-	
-	public boolean isAlarmOn(){
+
+	public boolean isAlarmOn() {
 		try {
 			mutex.acquire();
 		} catch (InterruptedException e) {
@@ -78,7 +79,5 @@ public class TimeState {
 		mutex.release();
 		return alarmOn;
 	}
-	
-	
 
 }
