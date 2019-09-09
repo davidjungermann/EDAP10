@@ -1,24 +1,15 @@
 package clock;
 
-import java.time.LocalTime;
 import java.util.concurrent.Semaphore;
 
 public class ClockTicker implements Runnable {
 
 	private ClockOutput out;
-	private Semaphore mutex;
-	private ClockInput in;
 	private TimeState timeState;
 
 	public ClockTicker(ClockOutput out, ClockInput in, Semaphore mutex, TimeState timeState) {
-		this.in = in;
 		this.out = out;
-		this.mutex = mutex;
 		this.timeState = timeState;
-	}
-
-	public ClockTicker() {
-
 	}
 
 	public void run() {

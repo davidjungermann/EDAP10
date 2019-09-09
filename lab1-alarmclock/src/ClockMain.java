@@ -31,9 +31,13 @@ public class ClockMain {
 			int mm = value % 100;
 			value /= 100;
 			int hh = value % 100;
-			
+
 			if (choice == 1 && value != 999999) {
 				timeState.setTime(LocalTime.of(hh, mm, ss));
+			}
+
+			if (choice == 2 && value != 999999) {
+				timeState.setAlarmTime(LocalTime.of(hh, mm, ss));
 			}
 			System.out.println("choice = " + choice + " value=" + value);
 			System.out.println("HH: " + hh);
