@@ -33,11 +33,11 @@ public class ClockTicker implements Runnable {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			out.displayTime((Integer.parseInt(timeValue)));
 			mutex.release();
 			sleepTime = (intervalTime - (System.currentTimeMillis() - startTime) % intervalTime);
 			try {
 				Thread.sleep(sleepTime);
+				out.displayTime((Integer.parseInt(timeValue)));
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
