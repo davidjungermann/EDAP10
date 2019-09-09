@@ -40,10 +40,6 @@ public class ClockMain {
 				timeState.setAlarmTime(LocalTime.of(hh, mm, ss));
 			}
 			System.out.println("choice = " + choice + " value=" + value);
-			System.out.println("HH: " + hh);
-			System.out.println("MM: " + mm);
-			System.out.println("SS: " + ss);
-
 		}
 	}
 }
