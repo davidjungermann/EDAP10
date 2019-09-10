@@ -16,6 +16,7 @@ public class TimeState {
 		time = LocalTime.now();
 
 	}
+
 	public void setTime(LocalTime time) {
 		try {
 			mutex.acquire();
@@ -78,11 +79,12 @@ public class TimeState {
 		mutex.release();
 		return alarmOn;
 	}
-	
-	public boolean alarmSounding(){
+
+	public boolean alarmSounding() {
 		return alarmSounding;
 	}
-	public void setAlarmSounding(boolean bool){
+
+	public void setAlarmSounding(boolean bool) {
 		alarmSounding = bool;
 	}
 

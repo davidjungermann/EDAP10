@@ -19,12 +19,13 @@ public class ClockMain {
 		Semaphore mutex = new Semaphore(1);
 		Semaphore alarmTrigger = new Semaphore(0);
 		TimeState timeState = new TimeState(mutex);
+
 		ClockThread ct = new ClockThread(out, timeState, alarmTrigger);
-		Thread clockCounter = new Thread(ct);
+		Thread clockThread = new Thread(ct);
 		AlarmThread at = new AlarmThread(alarmTrigger, out);
 		Thread alarmThread = new Thread(at);
 		alarmThread.start();
-		clockCounter.start();
+		clockThread.start();
 
 		while (true) {
 			sem.acquire(); // wait for user input
@@ -48,7 +49,7 @@ public class ClockMain {
 				timeState.toggleAlarm();
 				out.setAlarmIndicator(timeState.isAlarmOn());
 			}
-			if(timeState.alarmSounding() && choice != 0){
+			if (timeState.alarmSounding() && choice != 0) {
 				timeState.setAlarmSounding(false);
 			}
 		}
