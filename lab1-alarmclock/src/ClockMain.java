@@ -6,7 +6,7 @@ import clock.ClockInput;
 import clock.ClockInput.UserInput;
 import clock.ClockOutput;
 import clock.ClockThread;
-import clock.TimeState;
+import clock.Monitor;
 import emulator.AlarmClockEmulator;
 
 public class ClockMain {
@@ -18,7 +18,7 @@ public class ClockMain {
 		Semaphore sem = in.getSemaphore();
 		Semaphore mutex = new Semaphore(1);
 		Semaphore alarmTrigger = new Semaphore(0);
-		TimeState timeState = new TimeState(mutex);
+		Monitor timeState = new Monitor(mutex);
 
 		ClockThread ct = new ClockThread(out, timeState, alarmTrigger);
 		Thread clockThread = new Thread(ct);

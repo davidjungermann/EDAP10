@@ -5,11 +5,11 @@ import java.util.concurrent.Semaphore;
 public class ClockThread implements Runnable {
 
 	private ClockOutput out;
-	private TimeState timeState;
+	private Monitor timeState;
 	private Semaphore alarmTrigger;
 	private int alarmTime;
 
-	public ClockThread(ClockOutput out, TimeState timeState, Semaphore alarmTrigger) {
+	public ClockThread(ClockOutput out, Monitor timeState, Semaphore alarmTrigger) {
 		this.out = out;
 		this.timeState = timeState;
 		this.alarmTrigger = alarmTrigger;

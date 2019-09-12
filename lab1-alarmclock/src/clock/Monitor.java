@@ -3,7 +3,7 @@ package clock;
 import java.time.LocalTime;
 import java.util.concurrent.Semaphore;
 
-public class TimeState {
+public class Monitor {
 
 	private LocalTime time;
 	private LocalTime alarmTime;
@@ -11,7 +11,7 @@ public class TimeState {
 	private boolean alarmSounding;
 	private Semaphore mutex;
 
-	public TimeState(Semaphore mutex) {
+	public Monitor(Semaphore mutex) {
 		this.mutex = mutex;
 		time = LocalTime.now();
 
