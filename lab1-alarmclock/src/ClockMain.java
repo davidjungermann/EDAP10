@@ -18,9 +18,9 @@ public class ClockMain {
 		Semaphore sem = in.getSemaphore();
 		Semaphore mutex = new Semaphore(1);
 		Semaphore alarmTrigger = new Semaphore(0);
-		Monitor timeState = new Monitor(mutex);
+		Monitor timeState = new Monitor(mutex, alarmTrigger, out);
 
-		ClockThread ct = new ClockThread(out, timeState, alarmTrigger);
+		ClockThread ct = new ClockThread(out, timeState, alarmTrigger, mutex);
 		Thread clockThread = new Thread(ct);
 		AlarmThread at = new AlarmThread(alarmTrigger, out);
 		Thread alarmThread = new Thread(at);
@@ -49,8 +49,8 @@ public class ClockMain {
 				timeState.toggleAlarm();
 				out.setAlarmIndicator(timeState.isAlarmOn());
 			}
-			if (timeState.alarmSounding() && choice != 0) {
-				timeState.setAlarmSounding(false);
+			if (choice != 0) {
+				timeState.abortAlarm();
 			}
 		}
 	}

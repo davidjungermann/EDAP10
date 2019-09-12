@@ -8,11 +8,13 @@ public class ClockThread implements Runnable {
 	private Monitor timeState;
 	private Semaphore alarmTrigger;
 	private int alarmTime;
+	private Semaphore mutex;
 
-	public ClockThread(ClockOutput out, Monitor timeState, Semaphore alarmTrigger) {
+	public ClockThread(ClockOutput out, Monitor timeState, Semaphore alarmTrigger, Semaphore mutex) {
 		this.out = out;
 		this.timeState = timeState;
 		this.alarmTrigger = alarmTrigger;
+		this.mutex = mutex;
 		alarmTime = 20;
 	}
 
@@ -23,36 +25,13 @@ public class ClockThread implements Runnable {
 		int alarmTick = 0;
 		while (true) {
 			sleepTime = (intervalTime - (System.currentTimeMillis() - startTime) % intervalTime);
-			try {
-				Thread.sleep(sleepTime);
-				String timeValue = timeState.getTime().toString().replace(":", "");
-				if (timeValue.length() == 4) {
-					timeValue = timeValue + "00";
+				try {
+					Thread.sleep(sleepTime);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				if (timeValue.contains(".")) {
-
-					timeValue = timeValue.substring(0, timeValue.indexOf("."));
-				}
-
-				out.displayTime((Integer.parseInt(timeValue)));
-
-				if (timeState.isAlarmOn()) {
-					if (timeState.getAlarmTime() != null
-							&& ((timeState.getTime().compareTo(timeState.getAlarmTime()) == 0))) {
-						timeState.setAlarmSounding(true);
-						alarmTick = 0;
-					}
-					if (timeState.alarmSounding() && alarmTick <= alarmTime) {
-						alarmTick++;
-						alarmTrigger.release();
-					} else if (alarmTick == alarmTime) {
-						timeState.setAlarmSounding(false);
-					}
-				}
-				timeState.setTime(timeState.getTime().plusSeconds(1));
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
+				timeState.updateTime();
 		}
 	}
 }

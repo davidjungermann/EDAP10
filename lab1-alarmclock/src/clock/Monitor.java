@@ -5,32 +5,32 @@ import java.util.concurrent.Semaphore;
 
 public class Monitor {
 
+	private int alarmTick;
 	private LocalTime time;
 	private LocalTime alarmTime;
 	private boolean alarmOn;
 	private boolean alarmSounding;
 	private Semaphore mutex;
+	private Semaphore alarmTrigger;
+	private ClockOutput out;
 
-	public Monitor(Semaphore mutex) {
+	public Monitor(Semaphore mutex, Semaphore alarmTrigger, ClockOutput out) {
+		this.alarmTrigger = alarmTrigger;
+		this.out = out;
 		this.mutex = mutex;
 		time = LocalTime.now();
 
 	}
 
 	public void setTime(LocalTime time) {
-		try {
-			mutex.acquire();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 		this.time = time.withNano(00);
-		mutex.release();
 	}
 
 	public LocalTime getTime() {
 		try {
 			mutex.acquire();
 		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		LocalTime time = this.time;
@@ -39,53 +39,89 @@ public class Monitor {
 	}
 
 	public void setAlarmTime(LocalTime time) {
-		try {
-			mutex.acquire();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 		this.alarmTime = time;
-		mutex.release();
 	}
 
 	public LocalTime getAlarmTime() {
-		try {
-			mutex.acquire();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 		LocalTime time = this.alarmTime;
-		mutex.release();
 		return time;
 	}
 
 	public void toggleAlarm() {
-		try {
-			mutex.acquire();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 		this.alarmOn = !alarmOn;
-		mutex.release();
 	}
 
 	public boolean isAlarmOn() {
-		try {
-			mutex.acquire();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		boolean alarmOn = this.alarmOn;
-		mutex.release();
-		return alarmOn;
+		return this.alarmOn;
 	}
 
-	public boolean alarmSounding() {
+	private boolean alarmSounding() {
 		return alarmSounding;
 	}
 
-	public void setAlarmSounding(boolean bool) {
+	private void setAlarmSounding(boolean bool) {
 		alarmSounding = bool;
+	}
+	
+	private void resetAlarmTick() {
+		alarmTick = 0;
+	}
+
+	private int incrementAlarmTick() {
+		return alarmTick++;
+	}
+	public void checkAlarm() {
+		try {
+			mutex.acquire();
+			if (isAlarmOn()) {
+				if (alarmSounding() && incrementAlarmTick() < 20) {
+					alarmTrigger.release();
+				} else {
+					setAlarmSounding(false);
+					resetAlarmTick();
+				}
+				if (getAlarmTime() != null && ((getTime().compareTo(getAlarmTime()) == 0))) {
+					setAlarmSounding(true);
+				}
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		mutex.release();
+	}
+
+	public void abortAlarm() {
+		try {
+			mutex.acquire();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		setAlarmSounding(false);
+		resetAlarmTick();
+		mutex.release();
+	}
+	
+	public void updateTime() {
+		try {
+			mutex.acquire();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String timeValue = time.toString().replace(":", "");
+		if (timeValue.length() == 4) {
+			timeValue = timeValue + "00";
+		}
+		if (timeValue.contains(".")) {
+			timeValue = timeValue.substring(0, timeValue.indexOf("."));
+		}
+		
+		out.displayTime((Integer.parseInt(timeValue)));
+		time = time.plusSeconds(1);
+		mutex.release();
+		checkAlarm();
 	}
 
 }
