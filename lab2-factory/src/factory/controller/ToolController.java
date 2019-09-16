@@ -37,16 +37,24 @@ public class ToolController {
 
   private void paint() throws InterruptedException {
     paint.on();
-    wait(paintingMillis);
+    waitOutside(paintingMillis);
     paint.off();
-    wait(paintingMillis);
+    waitOutside(paintingMillis);
   }
 
   private void press() throws InterruptedException {
     press.on();
-    wait(pressingMillis);
+    waitOutside(pressingMillis);
     press.off();
-    wait(pressingMillis);
+    waitOutside(pressingMillis);
+  }
+  
+  private void waitOutside(long millis) throws InterruptedException {
+    long timeToWakeUp = System.currentTimeMillis() + millis;
+    while (System.currentTimeMillis() < timeToWakeUp) {
+      long dt = timeToWakeUp - System.currentTimeMillis();
+      wait(dt);
+    }
   }
 
   // -----------------------------------------------------------------------
