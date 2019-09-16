@@ -19,42 +19,34 @@ public class ToolController {
     this.paintingMillis = paintingMillis;
   }
 
-  public void onPressSensorHigh(WidgetKind widgetKind) throws InterruptedException {
+  public synchronized void onPressSensorHigh(WidgetKind widgetKind) throws InterruptedException {
     if (widgetKind == WidgetKind.BLUE_RECTANGULAR_WIDGET) {
-      stopConveyor();
+      conveyor.off();
       press();
-      startConveyor();
+      conveyor.on();
     }
   }
 
-  public void onPaintSensorHigh(WidgetKind widgetKind) throws InterruptedException {
+  public synchronized void onPaintSensorHigh(WidgetKind widgetKind) throws InterruptedException {
     if (widgetKind == WidgetKind.ORANGE_ROUND_WIDGET) {
-      stopConveyor();
+      conveyor.off();
       paint();
-      startConveyor();
+      conveyor.on();
     }
   }
 
   private void paint() throws InterruptedException {
     paint.on();
-    Thread.sleep(paintingMillis);
+    wait(paintingMillis);
     paint.off();
-    Thread.sleep(paintingMillis);
+    wait(paintingMillis);
   }
 
   private void press() throws InterruptedException {
     press.on();
-    Thread.sleep(pressingMillis);
+    wait(pressingMillis);
     press.off();
-    Thread.sleep(pressingMillis);
-  }
-
-  private synchronized void stopConveyor() {
-    conveyor.off();
-  }
-
-  private synchronized void startConveyor() {
-    conveyor.on();
+    wait(pressingMillis);
   }
 
   // -----------------------------------------------------------------------
