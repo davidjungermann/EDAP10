@@ -7,8 +7,6 @@ import factory.swingview.Factory;
 public class ToolController {
   private final DigitalSignal conveyor, press, paint;
   private final long pressingMillis, paintingMillis;
-  private boolean isPressing;
-  private boolean isPainting;
 
   public ToolController(DigitalSignal conveyor, DigitalSignal press, DigitalSignal paint, long pressingMillis,
       long paintingMillis) {
@@ -48,7 +46,7 @@ public class ToolController {
     press.off();
     waitOutside(pressingMillis);
   }
-  
+
   private void waitOutside(long millis) throws InterruptedException {
     long timeToWakeUp = System.currentTimeMillis() + millis;
     while (System.currentTimeMillis() < timeToWakeUp) {
