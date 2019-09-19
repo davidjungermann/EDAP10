@@ -30,7 +30,7 @@ public class ToolController {
       conveyor.off();
       paint();
       conveyor.on();
-    }
+	}
   }
 
   private void paint() throws InterruptedException {
