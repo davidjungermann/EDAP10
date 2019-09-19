@@ -38,6 +38,7 @@ public class ToolController {
     waitOutside(paintingMillis);
     paint.off();
     waitOutside(paintingMillis);
+    
   }
 
   private void press() throws InterruptedException {

@@ -9,6 +9,7 @@ public class OnePersonRidesLift {
         LiftView view = new LiftView();
 
         Passenger passenger = view.createPassenger();
+        
 
         int from = passenger.getStartFloor();
         int to   = passenger.getDestinationFloor();
