@@ -55,16 +55,16 @@ public class CodeBreaker implements SnifferCallback {
     public void onMessageIntercepted(String message, BigInteger n) {
         //System.out.println("message intercepted (N=" + n + ")...");
     	WorklistItem workListItem = new WorklistItem(n, "N: " + n);
-    	JButton button = new JButton();
+    	JButton button = new JButton("LET'S GET CRACKIN'");
     	button.addActionListener(e -> {
     		moveItem(workListItem, button);
-    		startCrackin(n);
+    		startCrackinG(n);
     	});
     	workListItem.add(button);
         workList.add(workListItem);
     }
     
-    private void startCrackin(BigInteger n){
+    private void startCrackinG(BigInteger n){
     	
     	
     }
