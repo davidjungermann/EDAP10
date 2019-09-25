@@ -33,7 +33,11 @@ public class ElevatorState {
 	}
 
 	public synchronized void move() throws InterruptedException {
+		exitMutex.acquire();
+		enterMutex.acquire();
 		chooseDirection();
+		exitMutex.release();
+		enterMutex.release();
 		if (direction == Direction.STILL) {
 			wait();
 		} else {
@@ -79,10 +83,11 @@ public class ElevatorState {
 			wait();
 			pressButton(passenger);
 		} else {
+			enterMutex.acquire();
 			passengers++;
 			waitEntry[passenger.getStartFloor()]--;
 			waitExit[passenger.getDestinationFloor()]++;
-			enterMutex.acquire();
+			notifyAll();
 		}
 	}
 
@@ -108,9 +113,9 @@ public class ElevatorState {
 		while (currFloor != passenger.getDestinationFloor()) {
 			wait();
 		}
+		exitMutex.acquire();
 		waitExit[passenger.getDestinationFloor()]--;
 		passengers--;
-		exitMutex.acquire();
 		notifyAll();
 	}
 	public void exit (Passenger passenger) throws InterruptedException{
@@ -164,16 +169,6 @@ public class ElevatorState {
 		}
 
 		if (direction == Direction.STILL) {
-			for (int i = currFloor - 1; i >= 0; i--) {
-				if (waitExit[i] != 0) {
-					direction = Direction.DOWN;
-				}
-			}
-			for (int i = currFloor + 1; i <= 6; i++) {
-				if (waitExit[i] != 0) {
-					direction = Direction.UP;
-				}
-			}
 
 			for (int i = currFloor - 1; i >= 0; i--) {
 				if (waitEntry[i] != 0) {
@@ -182,6 +177,17 @@ public class ElevatorState {
 			}
 			for (int i = currFloor + 1; i <= 6; i++) {
 				if (waitEntry[i] != 0) {
+					direction = Direction.UP;
+				}
+			}
+			
+			for (int i = currFloor - 1; i >= 0; i--) {
+				if (waitExit[i] != 0) {
+					direction = Direction.DOWN;
+				}
+			}
+			for (int i = currFloor + 1; i <= 6; i++) {
+				if (waitExit[i] != 0) {
 					direction = Direction.UP;
 				}
 			}
