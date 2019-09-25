@@ -16,7 +16,7 @@ public class ElevatorState {
 	private int[] waitEntry;
 	private int[] waitExit;
 	private int passengers;
-	private Semaphore mutex;
+	private Semaphore buttonMutex;
 	private Semaphore exitMutex;
 	private Semaphore enterMutex;
 
@@ -27,18 +27,19 @@ public class ElevatorState {
 		this.waitEntry = new int[7];
 		this.waitExit = new int[7];
 		this.passengers = 0;
-		this.mutex = new Semaphore(1);
+		this.buttonMutex = new Semaphore(1);
 		this.exitMutex = new Semaphore(1);
 		this.enterMutex = new Semaphore(1);
 	}
 
 	public synchronized void move() throws InterruptedException {
-		waitForButtonPress();
 		chooseDirection();
-		waitForEnter();
-		exitMutex.acquire();
-		enterMutex.acquire();
-		if (direction != Direction.STILL) {
+		if (direction == Direction.STILL) {
+			wait();
+		} else {
+			waitForEnter();
+			exitMutex.acquire();
+			enterMutex.acquire();
 			if (direction == Direction.UP) {
 				view.moveLift(currFloor, currFloor + 1);
 				currFloor = currFloor + 1;
@@ -46,10 +47,10 @@ public class ElevatorState {
 				view.moveLift(currFloor, currFloor - 1);
 				currFloor = currFloor - 1;
 			}
+			exitMutex.release();
+			enterMutex.release();
+			notifyAll();
 		}
-		exitMutex.release();
-		enterMutex.release();
-		notifyAll();
 	}
 
 	private void waitForEnter() throws InterruptedException {
@@ -59,12 +60,13 @@ public class ElevatorState {
 	}
 
 	public void pressButton(Passenger passenger) throws InterruptedException {
-		mutex.acquire();
+		buttonMutex.acquire();
 		waitEntry[passenger.getStartFloor()]++;
-		mutex.release();
+		buttonMutex.release();
+		waitForElevator(passenger);
 	}
 
-	public synchronized boolean waitForElevator(Passenger passenger) throws InterruptedException {
+	private synchronized void waitForElevator(Passenger passenger) throws InterruptedException {
 		notifyAll();
 		while (passenger.getStartFloor() != currFloor || passengers == 4) {
 			wait();
@@ -75,13 +77,13 @@ public class ElevatorState {
 				notifyAll();
 			//}
 			wait();
-			return false;
+			pressButton(passenger);
+		} else {
+			passengers++;
+			waitEntry[passenger.getStartFloor()]--;
+			waitExit[passenger.getDestinationFloor()]++;
+			enterMutex.acquire();
 		}
-		passengers++;
-		waitEntry[passenger.getStartFloor()]--;
-		waitExit[passenger.getDestinationFloor()]++;
-		enterMutex.acquire();
-		return true;
 	}
 
 	private boolean isWrongDirection(Passenger passenger) {
@@ -97,8 +99,6 @@ public class ElevatorState {
 
 	public void enterElevator(Passenger passenger) throws InterruptedException {
 		passenger.enterLift();
-		//if ((waitEntry[currFloor] == 0 || passengers == 4) && waitExit[currFloor] == 0) {			
-		//}
 		enterMutex.release();
 		waitToExit(passenger);
 	}
@@ -184,25 +184,6 @@ public class ElevatorState {
 				if (waitEntry[i] != 0) {
 					direction = Direction.UP;
 				}
-			}
-		}
-	}
-
-	private void waitForButtonPress() throws InterruptedException {
-		boolean noQueue = true;
-		while (noQueue) {
-			for (int floor : waitEntry) {
-				if (floor != 0) {
-					noQueue = false;
-				}
-			}
-			for (int floor : waitExit) {
-				if (floor != 0) {
-					noQueue = false;
-				}
-			}
-			if (noQueue) {
-				wait();
 			}
 		}
 	}
