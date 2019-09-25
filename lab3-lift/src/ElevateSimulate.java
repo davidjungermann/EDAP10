@@ -6,7 +6,7 @@ import lift.Passenger;
 
 public class ElevateSimulate {
 
-	private static final int MAX_PASSENGER = 10;
+	private static final int MAX_PASSENGER = 20;
 
 	public static void main(String[] args) throws InterruptedException {
 
@@ -14,6 +14,7 @@ public class ElevateSimulate {
 		Random rand = new Random();
 		Semaphore nbrOfPassengers = new Semaphore(MAX_PASSENGER);
 		ElevatorState elevatorState = new ElevatorState(view);
+		
 
 		Runnable passengerThread = () -> {
 			Passenger passenger = view.createPassenger();
@@ -21,7 +22,11 @@ public class ElevateSimulate {
 				Thread.sleep(rand.nextInt(45000));
 			passenger.begin();
 			elevatorState.pressButton(passenger);
-			elevatorState.waitForElevator(passenger);
+			while(!elevatorState.waitForElevator(passenger)){
+				elevatorState.pressButton(passenger);
+			}
+			elevatorState.enterElevator(passenger);
+			elevatorState.exit(passenger);
 			passenger.end();
 			nbrOfPassengers.release();
 			} catch (InterruptedException e) {
