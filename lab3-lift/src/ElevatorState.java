@@ -74,13 +74,6 @@ public class ElevatorState {
   }
 
   private boolean isWrongDirection(Passenger passenger) {
-    /*if (direction == Direction.STILL) {
-      return false;
-    } else if (direction == Direction.DOWN && passenger.getDestinationFloor() < currFloor) {
-      return false;
-    } else if (direction == Direction.UP && passenger.getDestinationFloor() > currFloor) {
-      return false;
-    }*/
     return false;
   }
 
@@ -111,30 +104,6 @@ public class ElevatorState {
     if (currFloor == 0) {
       direction = Direction.UP;
     }
-    
-    
-
-    /*
-     * if (currFloor == 6) { direction = Direction.STILL; } if (currFloor == 0) {
-     * direction = Direction.STILL; }
-     * 
-     * if (direction == Direction.UP) { for (int i = currFloor + 1; i <= 6; i++) {
-     * if (waitExit[i] != 0) { return; } } for (int i = currFloor + 1; i <= 6; i++)
-     * { if (waitEntry[i] != 0) { return; } } direction = Direction.STILL; return; }
-     * else if (direction == Direction.DOWN) { for (int i = currFloor - 1; i >= 0;
-     * i--) { if (waitExit[i] != 0) { return; } } for (int i = currFloor - 1; i >=
-     * 0; i--) { if (waitEntry[i] != 0) { return; } } direction = Direction.STILL;
-     * return; }
-     * 
-     * if (direction == Direction.STILL) { for (int i = currFloor - 1; i >= 0; i--)
-     * { if (waitExit[i] != 0) { direction = Direction.DOWN; } } for (int i =
-     * currFloor + 1; i <= 6; i++) { if (waitExit[i] != 0) { direction =
-     * Direction.UP; } }
-     * 
-     * for (int i = currFloor - 1; i >= 0; i--) { if (waitEntry[i] != 0) { direction
-     * = Direction.DOWN; } } for (int i = currFloor + 1; i <= 6; i++) { if
-     * (waitEntry[i] != 0) { direction = Direction.UP; } } }
-     */
   }
 
   private void waitForButtonPress() throws InterruptedException {
