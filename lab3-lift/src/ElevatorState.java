@@ -1,3 +1,5 @@
+import java.util.concurrent.Semaphore;
+
 import lift.LiftView;
 import lift.Passenger;
 
@@ -5,151 +7,194 @@ public class ElevatorState {
 
 	private int currFloor;
 	private LiftView view;
-	private boolean direction; // False going down, true going up
+
+	private static enum Direction {
+		UP, STILL, DOWN
+	}
+
+	private Direction direction;
 	private int[] waitEntry;
 	private int[] waitExit;
 	private int passengers;
-	
+	private Semaphore mutex;
+
 	public ElevatorState(LiftView view) {
 		this.view = view;
 		this.currFloor = 0;
-		this.direction = true;
+		this.direction = Direction.STILL;
 		this.waitEntry = new int[7];
 		this.waitExit = new int[7];
 		this.passengers = 0;
+		this.mutex = new Semaphore(1);
 	}
 
 	public synchronized void move() throws InterruptedException {
 		waitForButtonPress();
-		direction = chooseDirection();
-		if (direction) {
-			view.moveLift(currFloor, currFloor + 1);
-			currFloor = currFloor + 1;
-		} else {
-			view.moveLift(currFloor, currFloor - 1);
-			currFloor = currFloor - 1;
-		}
-		direction = chooseDirection();
-		notifyAll();
+		chooseDirection();
 		waitForEnter();
+		chooseDirection();
+		if (direction != Direction.STILL) {
+			if (direction == Direction.UP) {
+				view.moveLift(currFloor, currFloor + 1);
+				currFloor = currFloor + 1;
+			} else if (direction == Direction.DOWN) {
+				view.moveLift(currFloor, currFloor - 1);
+				currFloor = currFloor - 1;
+			}
+		}
+		
+		notifyAll();
 	}
-	
-	
+
 	private void waitForEnter() throws InterruptedException {
 		while ((waitEntry[currFloor] != 0 && passengers != 4) || waitExit[currFloor] != 0) {
 			wait();
 		}
 	}
-	
-	public synchronized void pressButton(Passenger passenger) throws InterruptedException{
+
+	public void pressButton(Passenger passenger) throws InterruptedException {
+		mutex.acquire();
 		waitEntry[passenger.getStartFloor()]++;
-		notifyAll();
-		waitForElevator(passenger);
+		mutex.release();
 	}
-	
-	private void waitForElevator(Passenger passenger) throws InterruptedException {
-		while(passenger.getStartFloor() != currFloor || passengers == 4) {
+
+	public synchronized void waitForElevator(Passenger passenger) throws InterruptedException {
+		notifyAll();
+		while (passenger.getStartFloor() != currFloor || passengers == 4) {
 			wait();
 		}
-		if(isWrongDirection(passenger)){
+		if (isWrongDirection(passenger)) {
 			waitEntry[passenger.getStartFloor()]--;
-			notifyAll();
+			//if ((waitEntry[currFloor] == 0 || passengers == 4) && waitExit[currFloor] == 0) {
+				notifyAll();
+			//}
 			wait();
 			pressButton(passenger);
-		} else{			
-		enterElevator(passenger);
-		notifyAll();
+			waitForElevator(passenger);
+		} else {
+			enterElevator(passenger);
 		}
 	}
-	
-	private boolean isWrongDirection(Passenger passenger){
-		if(direction) {
-			if (passenger.getDestinationFloor() > currFloor){				
-				return false;
-			}
-		} else {
-			if (passenger.getDestinationFloor() < currFloor){				
-				return false;
-			}
+
+	private boolean isWrongDirection(Passenger passenger) {
+		if (direction == Direction.STILL) {
+			return false;
+		} else if (direction == Direction.DOWN && passenger.getDestinationFloor() < currFloor) {
+			return false;
+		} else if (direction == Direction.UP && passenger.getDestinationFloor() > currFloor) {
+			return false;
 		}
 		return true;
 	}
-	
-	private void enterElevator(Passenger passenger) throws InterruptedException{
+
+	private void enterElevator(Passenger passenger) throws InterruptedException {
 		passenger.enterLift();
 		passengers++;
 		waitEntry[passenger.getStartFloor()]--;
 		waitExit[passenger.getDestinationFloor()]++;
-		notifyAll();
+		//if ((waitEntry[currFloor] == 0 || passengers == 4) && waitExit[currFloor] == 0) {
+			notifyAll();
+		//}
 		waitToExit(passenger);
 	}
-	
+
 	private void waitToExit(Passenger passenger) throws InterruptedException {
-		while(currFloor != passenger.getDestinationFloor()) {
+		while (currFloor != passenger.getDestinationFloor()) {
 			wait();
 		}
 		passenger.exitLift();
 		waitExit[passenger.getDestinationFloor()]--;
 		passengers--;
-		notifyAll();
+		//if (waitEntry[currFloor] == 0 && waitExit[currFloor] == 0) {
+			notifyAll();
+		//}
 	}
-	
-	
-	private boolean chooseDirection() {
-		if (currFloor == 6) {
-			return false;
+
+	private void chooseDirection() {
+		
+		/*if (currFloor == 6) {
+			direction = Direction.DOWN;
 		}
 		if (currFloor == 0) {
-			return true;
+			direction = Direction.UP;
 		}
-		if (direction) {
-			for(int i = currFloor; i <= 6; i++) {
+		*/
+		
+		if (currFloor == 6) {
+			direction = Direction.STILL;
+		}
+		if (currFloor == 0) {
+			direction = Direction.STILL;
+		}
+		
+		if (direction == Direction.UP) {
+			for (int i = currFloor + 1; i <= 6; i++) {
 				if (waitExit[i] != 0) {
-					return direction;
+					return;
 				}
 			}
-		} else if (!direction && passengers != 4){
-			for(int i = currFloor; i >= 0; i--) {
+			for (int i = currFloor + 1; i <= 6; i++) {
+				if (waitEntry[i] != 0) {
+					return;
+				}
+			}
+			direction = Direction.STILL;
+			return;
+		} else if (direction == Direction.DOWN) {
+			for (int i = currFloor - 1; i >= 0; i--) {
 				if (waitExit[i] != 0) {
-					return direction;
+					return;
+				}
+			}
+			for (int i = currFloor - 1; i >= 0; i--) {
+				if (waitEntry[i] != 0) {
+					return;
+				}
+			}
+			direction = Direction.STILL;
+			return;
+		}
+
+		if (direction == Direction.STILL) {
+			for (int i = currFloor - 1; i >= 0; i--) {
+				if (waitExit[i] != 0) {
+					direction = Direction.DOWN;
+				}
+			}
+			for (int i = currFloor + 1; i <= 6; i++) {
+				if (waitExit[i] != 0) {
+					direction = Direction.UP;
+				}
+			}
+
+			for (int i = currFloor - 1; i >= 0; i--) {
+				if (waitEntry[i] != 0) {
+					direction = Direction.DOWN;
+				}
+			}
+			for (int i = currFloor + 1; i <= 6; i++) {
+				if (waitEntry[i] != 0) {
+					direction = Direction.UP;
 				}
 			}
 		}
-		if (passengers != 4) {
-			if (direction) {
-				for(int i = currFloor; i <= 6; i++) {
-					if (waitEntry[i] != 0) {
-						return direction;
-					}
-				}
-			} else if (!direction){
-				for(int i = currFloor; i >= 0; i--) {
-					if (waitEntry[i] != 0) {
-						return direction;
-					}
-				}
-			}
-		}
-		if (passengers != 4){			
-			return !direction;
-		}
-		return direction;
 	}
-	private void waitForButtonPress() throws InterruptedException{
+
+	private void waitForButtonPress() throws InterruptedException {
 		boolean noQueue = true;
-		while(noQueue){
-			for(int floor : waitEntry) {
-				if(floor != 0){
+		while (noQueue) {
+			for (int floor : waitEntry) {
+				if (floor != 0) {
 					noQueue = false;
 				}
-			} 
-			for(int floor : waitExit) {
-				if(floor != 0){
+			}
+			for (int floor : waitExit) {
+				if (floor != 0) {
 					noQueue = false;
 				}
-			} 
+			}
 			if (noQueue) {
-				wait();				
+				wait();
 			}
 		}
 	}

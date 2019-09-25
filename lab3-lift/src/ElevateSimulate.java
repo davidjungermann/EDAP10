@@ -6,7 +6,7 @@ import lift.Passenger;
 
 public class ElevateSimulate {
 
-	private static final int MAX_PASSENGER = 20;
+	private static final int MAX_PASSENGER = 10;
 
 	public static void main(String[] args) throws InterruptedException {
 
@@ -21,15 +21,14 @@ public class ElevateSimulate {
 				Thread.sleep(rand.nextInt(45000));
 			passenger.begin();
 			elevatorState.pressButton(passenger);
+			elevatorState.waitForElevator(passenger);
 			passenger.end();
 			nbrOfPassengers.release();
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
 		};
-
 		Runnable liftThread = () -> {
 			while (true) {
 				try {
