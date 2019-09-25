@@ -35,14 +35,20 @@ public class ElevatorState {
     chooseDirection();
     if (direction != Direction.STILL) {
       if (direction == Direction.UP) {
-        view.moveLift(currFloor, currFloor + 1);
+        moveLift(currFloor, currFloor + 1);
+        // view.moveLift(currFloor, currFloor + 1);
         currFloor = currFloor + 1;
       } else if (direction == Direction.DOWN) {
-        view.moveLift(currFloor, currFloor - 1);
+        moveLift(currFloor, currFloor - 1);
+        // view.moveLift(currFloor, currFloor - 1);
         currFloor = currFloor - 1;
       }
     }
     notifyAll();
+  }
+
+  private void moveLift(int currFloor, int nextFloor) {
+    view.moveLift(currFloor, nextFloor);
   }
 
   private void waitForEnter() throws InterruptedException {
