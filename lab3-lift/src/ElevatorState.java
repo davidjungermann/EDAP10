@@ -36,11 +36,9 @@ public class ElevatorState {
     if (direction != Direction.STILL) {
       if (direction == Direction.UP) {
         moveLift(currFloor, currFloor + 1);
-        // view.moveLift(currFloor, currFloor + 1);
         currFloor = currFloor + 1;
       } else if (direction == Direction.DOWN) {
         moveLift(currFloor, currFloor - 1);
-        // view.moveLift(currFloor, currFloor - 1);
         currFloor = currFloor - 1;
       }
     }
