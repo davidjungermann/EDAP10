@@ -23,7 +23,6 @@ public class LiftMonitor {
     }
     isMoving = true;
     return calculateNext();
-
   }
 
   public synchronized int getCurrent() {
