@@ -79,6 +79,8 @@ public class CodeBreaker implements SnifferCallback {
 					JButton button = new JButton("Remove");
 					button.addActionListener(e -> {
 						progressList.remove(item);
+						mainProgressBar.setValue(mainProgressBar.getValue() - 1000000);
+						mainProgressBar.setMaximum(mainProgressBar.getMaximum() - 1000000);
 					});
 					item.add(button);
 				}
@@ -94,6 +96,8 @@ public class CodeBreaker implements SnifferCallback {
 		ProgressTracker tracker = new Tracker(item);
 		progressList.add(item);
 		startCrackinG(message, n, tracker, item);
+		mainProgressBar.setMaximum(mainProgressBar.getMaximum() + 1000000);
+	
 	}
 
 	private class Tracker implements ProgressTracker {
@@ -117,15 +121,16 @@ public class CodeBreaker implements SnifferCallback {
 		public void onProgress(int ppmDelta) {
 			totalProgress += ppmDelta;
 			final int percent = totalProgress / 10000;
-			if (percent != prevPercent) {
+
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						progressItem.getProgressBar().setValue(totalProgress);
+						progressItem.getProgressBar().setValue(progressItem.getProgressBar().getValue() + ppmDelta);
+						mainProgressBar.setValue(mainProgressBar.getValue() + ppmDelta);
 					}
 				});
 				System.out.println(percent);
 				prevPercent = percent;
-			}
+		
 		}
 
 	}
