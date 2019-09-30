@@ -8,13 +8,12 @@ public class ElevateSimulate {
 
 	private static final int MAX_PASSENGER = 30;
 
-	public static void main(String[] args) throws InterruptedException {
+  public static void main(String[] args) throws InterruptedException {
 
-		LiftView view = new LiftView();
-		Random rand = new Random();
-		Semaphore nbrOfPassengers = new Semaphore(MAX_PASSENGER);
-		ElevatorState elevatorState = new ElevatorState(view);
-		
+    LiftView view = new LiftView();
+    Random rand = new Random();
+    Semaphore nbrOfPassengers = new Semaphore(MAX_PASSENGER);
+    ElevatorState elevatorState = new ElevatorState(view);
 
 		Runnable runnablePassenger = () -> {
 			Passenger passenger = view.createPassenger();
