@@ -6,12 +6,12 @@ import lift.Passenger;
 
 public class PassengerThread extends Thread {
 
-  private Passenger p;
+  private Passenger passenger;
   private LiftMonitor monitor;
 
   public PassengerThread(LiftView view, LiftMonitor monitor) {
     this.monitor = monitor;
-    p = view.createPassenger();
+    passenger = view.createPassenger();
   }
 
   @Override
@@ -19,9 +19,9 @@ public class PassengerThread extends Thread {
 
     try {
       waiting();
-      p.begin();
-      monitor.rideLift(p);
-      p.end();
+      passenger.begin();
+      monitor.rideLift(passenger);
+      passenger.end();
     } catch (InterruptedException e) {
       throw new Error(e);
     }

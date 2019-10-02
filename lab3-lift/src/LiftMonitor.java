@@ -37,7 +37,7 @@ public class LiftMonitor {
   }
 
   public synchronized void rideLift(Passenger p) throws InterruptedException {
-    waitEntry[p.getStartFloor()] = waitEntry[p.getStartFloor()] + 1;
+    waitEntry[p.getStartFloor()]++;
     waitingTotal++;
     notifyAll();
     while (p.getStartFloor() != current || load > 3 || isMoving) {
