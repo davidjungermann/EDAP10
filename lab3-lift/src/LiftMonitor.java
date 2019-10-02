@@ -6,6 +6,7 @@ public class LiftMonitor {
   private int current, next, load, waitingTotal;
   private int[] waitEntry, waitExit;
   private boolean isMoving;
+  private boolean movingUp;
 
   public LiftMonitor() {
     current = 0;
@@ -46,8 +47,8 @@ public class LiftMonitor {
     p.enterLift();
     waitingTotal--;
     load++;
-    waitEntry[p.getStartFloor()] = waitEntry[p.getStartFloor()] - 1;
-    waitExit[p.getDestinationFloor()] = waitExit[p.getDestinationFloor()] + 1;
+    waitEntry[p.getStartFloor()]--;
+    waitExit[p.getDestinationFloor()]++;
     notifyAll();
 
     while (p.getDestinationFloor() != current || isMoving) {
@@ -55,27 +56,25 @@ public class LiftMonitor {
     }
     p.exitLift();
     load--;
-    waitExit[p.getDestinationFloor()] = waitExit[p.getDestinationFloor()] - 1;
+    waitExit[p.getDestinationFloor()]--;
     notifyAll();
   }
 
   private synchronized int calculateNext() {
-    if (waitEntry[current] == 0 && load == 0) {
-      int max = 0;
-      for (int i = 0; i < 7; i++) {
-        if (waitEntry[i] >= max && waitEntry[i] > 0) {
-          max = waitEntry[i];
-          next = i;
-        }
-      }
-    } else {
-      int max = 0;
-      for (int i = 0; i < 7; i++) {
-        if (waitExit[i] >= max && waitExit[i] > 0) {
-          max = waitExit[i];
-          next = i;
-        }
-      }
+    if (current == 0) {
+      movingUp = true;
+    } else if (current == 6) {
+      movingUp = false;
+    }
+
+    if (movingUp) {
+      next = current + 1;
+      current = next;
+    }
+
+    if (!movingUp) {
+      next = current - 1;
+      current = next;
     }
     return next;
   }
