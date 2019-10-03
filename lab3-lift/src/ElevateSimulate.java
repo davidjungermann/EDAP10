@@ -26,7 +26,6 @@ public class ElevateSimulate {
 			passenger.end();
 			nbrOfPassengers.release();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		};
@@ -39,7 +38,6 @@ public class ElevateSimulate {
 					view.moveLift(currFloor, nextFloor);
 					currFloor = nextFloor;
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
