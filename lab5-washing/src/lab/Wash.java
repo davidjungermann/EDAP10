@@ -31,12 +31,15 @@ public class Wash {
       case 0:
         currentThread.interrupt();
         break;
-        
+
+      case 1:
+        currentThread = new WashingProgram1(io, temp, water, spin);
+        currentThread.start();
+
       case 3:
         currentThread = new WashingProgram3(io, temp, water, spin);
         currentThread.start();
       }
-
 
       // TODO:
       // if the user presses buttons 1-3, start a washing program
