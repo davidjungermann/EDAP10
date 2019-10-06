@@ -13,8 +13,8 @@ public class MessagingThread<M> extends Thread {
    * 
    * @throws InterruptedException
    */
-  public void send(M message) throws InterruptedException {
-    queue.put(message);
+  public void send(M message) {
+    queue.add(message);
   }
 
   /** Returns the first message in the queue, or blocks if none available. */
@@ -26,6 +26,8 @@ public class MessagingThread<M> extends Thread {
    * Returns the first message in the queue, or blocks up to 'timeout'
    * milliseconds if none available. Returns null if no message is obtained within
    * 'timeout' milliseconds.
+   * 
+   * @throws InterruptedException
    */
   protected M receiveWithTimeout(long timeout) throws InterruptedException {
     return queue.poll(timeout, TimeUnit.MILLISECONDS);
