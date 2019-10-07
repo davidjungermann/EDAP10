@@ -22,7 +22,7 @@ public class WashingProgram1 extends MessagingThread<WashingMessage> {
 		try {
 			// instruct SpinController to rotate barrel slowly, back and forth
 		  io.lock(true);
-			water.send(new WashingMessage(this, WashingMessage.WATER_FILL, 100000));
+			water.send(new WashingMessage(this, WashingMessage.WATER_FILL, 10));
 			temp.send(new WashingMessage(this, WashingMessage.TEMP_SET, 40));
 			spin.send(new WashingMessage(this, WashingMessage.SPIN_SLOW));
 			// spin for 5 simulated minutes (one minute == 60000 milliseconds)
