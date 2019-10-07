@@ -4,39 +4,62 @@ import wash.WashingIO;
 
 public class TemperatureController extends MessagingThread<WashingMessage> {
 
-	WashingIO io;
-	long dt;
-	double mu;
-	double ml;
+  private WashingIO io;
+  private static final int dt = 10000;
+  private static final double mu = 0.678;
+  private static final double ml = -0.19048;
 
-	public TemperatureController(WashingIO io) {
-		this.io = io;
-		this.dt = 10000;
-		this.mu = 0.678;
-		this.ml = 0.19048;
-	}
+  private double currentTemp;
+  private double wantedTemp;
+  private double upperBound;
+  private double lowerBound;
 
-	@Override
-	public void run() {
-		while (true) {
-			try {
-				WashingMessage m = receive();
-				if (m.getCommand() == m.TEMP_SET) {
-					double goalTemp = m.getValue();
-					while (true) {
-						if (io.getTemperature() > goalTemp - mu) {
-							io.heat(false);
-						}
-						if (io.getTemperature() < goalTemp + ml) {
-							io.heat(true);
-						}
-						this.sleep(dt);
-					}
-				}
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
+  public TemperatureController(WashingIO io) {
+    this.io = io;
+  }
+
+  @Override
+  public void run() {
+    try {
+      while (true) {
+        WashingMessage m = receive();
+        while (m != null) {
+          if (m.getCommand() == WashingMessage.TEMP_IDLE) {
+            m = null;
+            break;
+          }
+
+          if (m.getCommand() == WashingMessage.TEMP_SET) {
+            while (true) {
+              m = receiveWithTimeout(dt / Wash.SPEEDUP);
+              if (m != null) {
+                wantedTemp = m.getValue();
+                upperBound = wantedTemp - mu;
+                lowerBound = wantedTemp + ml;
+              } else {
+                io.heat(false);
+                break;
+              }
+            }
+            currentTemp = io.getTemperature();
+
+            if (lowerBound >= currentTemp) {
+              io.heat(true);
+            } else if (upperBound <= currentTemp) {
+              io.heat(false);
+            }
+            if (currentTemp >= wantedTemp - 2 && currentTemp < wantedTemp) {
+              System.out.println(currentTemp + "Call: Temperature regulation");
+              send(new WashingMessage(this, WashingMessage.ACKNOWLEDGMENT));
+            }
+          }
+          break;
+        }
+      }
+    } catch (InterruptedException unexpected) {
+      // we don't expect this thread to be interrupted,
+      // so throw an error if it happens anyway
+      throw new Error(unexpected);
+    }
+  }
 }
