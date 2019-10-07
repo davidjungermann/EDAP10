@@ -31,14 +31,16 @@ public class Wash {
       case 0:
         currentThread.interrupt();
         break;
-
       case 1:
         currentThread = new WashingProgram1(io, temp, water, spin);
         currentThread.start();
-
+        break;
       case 3:
         currentThread = new WashingProgram3(io, temp, water, spin);
         currentThread.start();
+        break;
+      default:
+        throw new Error("Faulty value");
       }
 
       // TODO:

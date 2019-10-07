@@ -2,16 +2,7 @@ package lab;
 
 import wash.WashingIO;
 
-/**
- * Program 3 for washing machine. Serves as an example of how washing programs
- * are structured.
- * 
- * This short program stops all regulation of temperature and water levels,
- * stops the barrel from spinning, and drains the machine of water.
- * 
- * It is can be used after an emergency stop (program 0) or a power failure.
- */
-class WashingProgram1 extends MessagingThread<WashingMessage> {
+public class WashingProgram1 extends MessagingThread<WashingMessage> {
 
   private WashingIO io;
   private MessagingThread<WashingMessage> temp;

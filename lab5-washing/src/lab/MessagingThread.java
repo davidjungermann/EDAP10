@@ -1,12 +1,12 @@
 package lab;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class MessagingThread<M> extends Thread {
 
-  private BlockingQueue<M> queue = new LinkedBlockingDeque<>();
+  private BlockingQueue<M> queue = new LinkedBlockingQueue<M>();
 
   /**
    * Called by another thread, to send a message to this thread.
