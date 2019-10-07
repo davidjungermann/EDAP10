@@ -9,9 +9,9 @@ public class TemperatureController extends MessagingThread<WashingMessage> {
   private double upperBound;
   private double lowerBound;
   private int dt;
-  
+
   private static final double mu = 0.678;
-  private static final double ml = 0.20952;
+  private static final double ml = 1.19048;
 
   public TemperatureController(WashingIO io) {
     this.io = io;
@@ -30,11 +30,11 @@ public class TemperatureController extends MessagingThread<WashingMessage> {
           sender = m.getSender();
 
           switch (m.getCommand()) {
-          
+
           case WashingMessage.TEMP_IDLE:
             m = null;
             break;
-            
+
           case WashingMessage.TEMP_SET:
             temp = m.getValue();
             upperBound = temp - mu;
@@ -46,7 +46,7 @@ public class TemperatureController extends MessagingThread<WashingMessage> {
                 if (m.getCommand() == WashingMessage.TEMP_SET) {
                   temp = m.getValue();
                   upperBound = temp - mu;
-                  lowerBound = temp - ml;
+                  lowerBound = temp + ml;
                 } else {
                   io.heat(false);
                   break;
