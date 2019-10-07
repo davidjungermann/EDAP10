@@ -13,6 +13,7 @@ public class TemperatureController extends MessagingThread<WashingMessage> {
   private double wantedTemp;
   private double upperBound;
   private double lowerBound;
+  public MessagingThread<WashingMessage> sender;
 
   public TemperatureController(WashingIO io) {
     this.io = io;
@@ -24,6 +25,7 @@ public class TemperatureController extends MessagingThread<WashingMessage> {
       while (true) {
         WashingMessage m = receive();
         while (m != null) {
+          sender = m.getSender();
           if (m.getCommand() == WashingMessage.TEMP_IDLE) {
             m = null;
             break;
@@ -50,7 +52,7 @@ public class TemperatureController extends MessagingThread<WashingMessage> {
             }
             if (currentTemp >= wantedTemp - 2 && currentTemp < wantedTemp) {
               System.out.println(currentTemp + "Call: Temperature regulation");
-              send(new WashingMessage(this, WashingMessage.ACKNOWLEDGMENT));
+              send(new WashingMessage(sender, WashingMessage.ACKNOWLEDGMENT));
             }
           }
           break;
