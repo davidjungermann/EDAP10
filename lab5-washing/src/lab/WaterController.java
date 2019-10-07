@@ -18,7 +18,7 @@ public class WaterController extends MessagingThread<WashingMessage> {
 
   @Override
   public void run() {
-    dt = 1000;
+    dt = 100;
     MessagingThread<WashingMessage> sender;
 
     try {
@@ -46,8 +46,11 @@ public class WaterController extends MessagingThread<WashingMessage> {
                 if (m.getCommand() == WashingMessage.WATER_FILL) {
                   io.fill(false);
                   io.drain(false);
+                } else {
+                  io.fill(false);
+                  io.drain(false);
+                  break;
                 }
-                break;
               }
               currentLevel = io.getWaterLevel();
 
@@ -75,7 +78,7 @@ public class WaterController extends MessagingThread<WashingMessage> {
             while (true) {
               m = receiveWithTimeout((long) ((((io.getWaterLevel() / 0.2) - 1) * 1000) / Wash.SPEEDUP));
 
-              if (m != null && m.getCommand() != 8) {
+              if (m != null && m.getCommand() != WashingMessage.WATER_DRAIN) {
                 io.drain(false);
                 break;
               }
