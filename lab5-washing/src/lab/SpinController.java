@@ -18,31 +18,36 @@ public class SpinController extends MessagingThread<WashingMessage> {
   @Override
   public void run() {
     try {
-
       while (true) {
-        // wait for up to a (simulated) minute for a WashingMessage
-        WashingMessage message = receive();
+        WashingMessage m = receive();
+        while (m != null) {
+          if (m.getCommand() == WashingMessage.SPIN_OFF) {
+            io.setSpinMode(SPIN_IDLE);
+            m = null;
+            break;
+          }
 
-        if (message.getCommand() == WashingMessage.SPIN_SLOW) {
-          io.setSpinMode(SPIN_LEFT);
-          SpinController.sleep(60000 / Wash.SPEEDUP);
-          io.setSpinMode(SPIN_RIGHT);
+          if (m.getCommand() == WashingMessage.SPIN_SLOW) {
+            while (true) {
+              io.setSpinMode(SPIN_LEFT);
+              m = receiveWithTimeout(60000 / Wash.SPEEDUP);
+              if (m != null && m.getCommand() != 2) {
+                break;
+              }
+              io.setSpinMode(SPIN_RIGHT);
+              m = receiveWithTimeout(60000 / Wash.SPEEDUP);
+              if (m != null && m.getCommand() != 2) {
+                break;
+              }
+            }
+          }
+          if (m.getCommand() == WashingMessage.SPIN_FAST) {
+            io.setSpinMode(SPIN_FAST);
+            m = null;
+            break;
+          }
+
         }
-
-        if (message.getCommand() == WashingMessage.SPIN_FAST) {
-          io.setSpinMode(SPIN_FAST);
-        }
-
-        if (message.getCommand() == WashingMessage.SPIN_OFF) {
-          io.setSpinMode(SPIN_IDLE);
-        }
-
-        // if m is null, it means a minute passed and no message was received
-        if (message != null) {
-          System.out.println("got " + message);
-        }
-
-        // ... TODO ...
       }
     } catch (InterruptedException unexpected) {
       // we don't expect this thread to be interrupted,
