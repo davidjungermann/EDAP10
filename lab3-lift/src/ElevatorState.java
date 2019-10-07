@@ -35,26 +35,36 @@ public class ElevatorState {
 	
 	public synchronized int determineNextFloor() throws InterruptedException{
 		currFloor = nextFloor;
+		if (currFloor == 6) {
+			direction = Direction.STILL;
+		}
+		if (currFloor == 0) {
+			direction = Direction.STILL;
+		}
+		notifyAll();
 		return waitForEnter();
 	}
 	
 	public synchronized int waitForEnter() throws InterruptedException {
 		while ((waitEntry[currFloor] != 0 && passengers != 4) || waitExit[currFloor] != 0
 				|| direction == Direction.STILL) {
-			System.out.println(currFloor);
-			System.out.println(direction);
+			System.out.println("wait " + currFloor);
+			System.out.println("wait " + direction);
 			chooseDirection();
+			notifyAll();
 			wait();
+			chooseDirection();
+
 		}
+		chooseDirection();
+		currFloor = -1;
 		notifyAll();
-		System.out.println(currFloor);
-		System.out.println(direction);
-		return chooseDirection();
+		return nextFloor;
 	}
 
 	public synchronized void pressButton(Passenger passenger) throws InterruptedException {
-		notifyAll();
 		waitEntry[passenger.getStartFloor()]++;
+		notifyAll();
 		waitForElevator(passenger);
 	}
 
@@ -68,8 +78,8 @@ public class ElevatorState {
 			wait();
 			pressButton(passenger);
 		} else {
+			enterMutex.acquire();
 			passengers++;
-			waitEntry[passenger.getStartFloor()]--;
 			waitExit[passenger.getDestinationFloor()]++;
 			notifyAll();
 		}
@@ -86,8 +96,10 @@ public class ElevatorState {
 		return true;
 	}
 
-	public synchronized void enterElevator(Passenger passenger) throws InterruptedException {
+	public void enterElevator(Passenger passenger) throws InterruptedException {
 		passenger.enterLift();
+		waitEntry[passenger.getStartFloor()]--;
+		enterMutex.release();
 		waitToExit(passenger);
 	}
 
@@ -96,32 +108,21 @@ public class ElevatorState {
 		while (currFloor != passenger.getDestinationFloor()) {
 			wait();
 		}
-		waitExit[passenger.getDestinationFloor()]--;
+		exitMutex.acquire();
 		passengers--;
+		waitExit[passenger.getDestinationFloor()]--;
 		notifyAll();
 	}
 
-	public synchronized void exit(Passenger passenger) throws InterruptedException {
+	public void exit(Passenger passenger) throws InterruptedException {
 		passenger.exitLift();
-	}
-
-	public synchronized int getFloor() {
-		return currFloor;
-	}
-
-	public synchronized void setFloor(int floor) {
-		currFloor = floor;
-		notifyAll();
+		exitMutex.release();
 	}
 
 	public synchronized int chooseDirection() throws InterruptedException {
 		
-		if (currFloor == 6) {
-			direction = Direction.STILL;
-		}
-		if (currFloor == 0) {
-			direction = Direction.STILL;
-		}
+		enterMutex.acquire();
+		exitMutex.acquire();
 		
 		if (direction == Direction.STILL) {
 			for (int i = currFloor - 1; i >= 0; i--) {
@@ -188,10 +189,8 @@ public class ElevatorState {
 		if(direction == Direction.DOWN) {
 			nextFloor = currFloor - 1;
 		}
-		System.out.println("currFloor: " + currFloor);
-		System.out.println("nextFloor: " + nextFloor);
-		System.out.println("Direction: " + direction);
-		
+		enterMutex.release();
+		exitMutex.release();
 		return nextFloor;
 	}
 }
