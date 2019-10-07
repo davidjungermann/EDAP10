@@ -21,6 +21,7 @@ public class WashingProgram1 extends MessagingThread<WashingMessage> {
 	public void run() {
 		try {
 			// instruct SpinController to rotate barrel slowly, back and forth
+		  io.lock(true);
 			water.send(new WashingMessage(this, WashingMessage.WATER_FILL, 100000));
 			temp.send(new WashingMessage(this, WashingMessage.TEMP_SET, 40));
 			spin.send(new WashingMessage(this, WashingMessage.SPIN_SLOW));
