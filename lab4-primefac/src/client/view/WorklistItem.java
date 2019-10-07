@@ -18,28 +18,31 @@ import javax.swing.JTextArea;
 @SuppressWarnings("serial")
 public class WorklistItem extends JPanel {
 
-    public static final int HEIGHT = 100;
-    
-    private static final Font MESSAGE_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+  public static final int HEIGHT = 100;
 
-    /** Create the panel, displaying the integer _n_ and the encrypted message _code_. */
-    public WorklistItem(BigInteger n, String code) {
-        setBorder(BorderFactory.createTitledBorder("N=" + n + " (" + n.bitLength() + " bits)"));
+  private static final Font MESSAGE_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);
 
-        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+  /**
+   * Create the panel, displaying the integer _n_ and the encrypted message
+   * _code_.
+   */
+  public WorklistItem(BigInteger n, String code) {
+    setBorder(BorderFactory.createTitledBorder("N=" + n + " (" + n.bitLength() + " bits)"));
 
-        JTextArea textArea = new JTextArea(code);
-        textArea.setPreferredSize(new Dimension());  // make sure it shrinks as needed
-        textArea.setFont(MESSAGE_FONT);
-        textArea.setBackground(Color.BLACK);
-        textArea.setForeground(Color.GREEN);
-        textArea.setLineWrap(true);
-        textArea.setEditable(false);
+    setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
-        add(textArea);
+    JTextArea textArea = new JTextArea(code);
+    textArea.setPreferredSize(new Dimension()); // make sure it shrinks as needed
+    textArea.setFont(MESSAGE_FONT);
+    textArea.setBackground(Color.BLACK);
+    textArea.setForeground(Color.GREEN);
+    textArea.setLineWrap(true);
+    textArea.setEditable(false);
 
-        // make sure this component shrinks and grows as needed
-        setPreferredSize(new Dimension(0, HEIGHT));
-        setMaximumSize(new Dimension(Integer.MAX_VALUE, HEIGHT));
-    }
+    add(textArea);
+
+    // make sure this component shrinks and grows as needed
+    setPreferredSize(new Dimension(0, HEIGHT));
+    setMaximumSize(new Dimension(Integer.MAX_VALUE, HEIGHT));
+  }
 }
