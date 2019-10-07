@@ -6,10 +6,12 @@ import lift.Passenger;
 
 public class ElevateSimulate {
 
-	private static final int MAX_PASSENGER = 30;
+	private static final int MAX_PASSENGER = 40;
 
   public static void main(String[] args) throws InterruptedException {
 
+	Semaphore enterMutex;
+	Semaphore extiMutex;
     LiftView view = new LiftView();
     Random rand = new Random();
     Semaphore nbrOfPassengers = new Semaphore(MAX_PASSENGER);
