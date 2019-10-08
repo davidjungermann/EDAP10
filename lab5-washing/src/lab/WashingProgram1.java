@@ -48,13 +48,17 @@ public class WashingProgram1 extends MessagingThread<WashingMessage> {
         }
       }
 
+      int i = 0;
       while (true) {
         water.send(new WashingMessage(this, WashingMessage.WATER_DRAIN));
         m = receive();
         if (m.getCommand() == WashingMessage.ACKNOWLEDGMENT && m.getSender() == water) {
           water.send(new WashingMessage(this, WashingMessage.WATER_FILL, 10));
+          i++;
           Thread.sleep(2 * 60000 / Wash.SPEEDUP);
-          break;
+          if (i == 5) {
+            break;
+          }
         }
       }
 

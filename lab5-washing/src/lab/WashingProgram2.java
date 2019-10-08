@@ -50,7 +50,6 @@ public class WashingProgram2 extends MessagingThread<WashingMessage> {
           break;
         }
       }
-
       while (true) {
         water.send(new WashingMessage(this, WashingMessage.WATER_DRAIN));
         m = receive();

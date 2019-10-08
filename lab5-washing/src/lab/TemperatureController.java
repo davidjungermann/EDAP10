@@ -54,15 +54,16 @@ public class TemperatureController extends MessagingThread<WashingMessage> {
               }
 
               currentTemp = io.getTemperature();
+              if (io.getWaterLevel() > 1) {
+                if (lowerBound >= currentTemp) {
+                  io.heat(true);
+                } else if (upperBound <= currentTemp) {
+                  io.heat(false);
+                }
 
-              if (lowerBound >= currentTemp) {
-                io.heat(true);
-              } else if (upperBound <= currentTemp) {
-                io.heat(false);
-              }
-
-              if (currentTemp >= temp - 2 && currentTemp < temp) {
-                sender.send(new WashingMessage(this, WashingMessage.ACKNOWLEDGMENT));
+                if (currentTemp >= temp - 2 && currentTemp < temp) {
+                  sender.send(new WashingMessage(this, WashingMessage.ACKNOWLEDGMENT));
+                }
               }
             }
             break;
