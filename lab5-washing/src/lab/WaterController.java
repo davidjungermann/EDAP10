@@ -10,7 +10,7 @@ public class WaterController extends MessagingThread<WashingMessage> {
   private double lowerBound;
   private int dt;
 
-  private static final double margin = 0.05;
+  private static final double margin = 0.06;
 
   public WaterController(WashingIO io) {
     this.io = io;
@@ -46,6 +46,9 @@ public class WaterController extends MessagingThread<WashingMessage> {
                 if (m.getCommand() == WashingMessage.WATER_FILL) {
                   io.fill(false);
                   io.drain(false);
+                  wantedLevel = m.getValue();
+                  upperBound = wantedLevel - margin;
+                  lowerBound = wantedLevel + margin;
                 } else {
                   io.fill(false);
                   io.drain(false);
@@ -74,17 +77,13 @@ public class WaterController extends MessagingThread<WashingMessage> {
 
           case WashingMessage.WATER_DRAIN:
             io.drain(true);
-
             while (true) {
               m = receiveWithTimeout((long) ((((io.getWaterLevel() / 0.2) - 1) * 1000) / Wash.SPEEDUP));
-
               if (m != null && m.getCommand() != WashingMessage.WATER_DRAIN) {
                 io.drain(false);
                 break;
               }
-
               currentLevel = io.getWaterLevel();
-
               if (currentLevel == 0) {
                 io.drain(false);
                 sender.send(new WashingMessage(this, WashingMessage.ACKNOWLEDGMENT));

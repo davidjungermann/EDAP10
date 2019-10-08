@@ -7,7 +7,7 @@ public class Wash {
 
   // simulation speed-up factor:
   // 50 means the simulation is 50 times faster than real time
-  public static final int SPEEDUP = 100;
+  public static final int SPEEDUP = 150;
   private static Thread currentThread;
 
   public static void main(String[] args) throws InterruptedException {
@@ -33,6 +33,10 @@ public class Wash {
         break;
       case 1:
         currentThread = new WashingProgram1(io, temp, water, spin);
+        currentThread.start();
+        break;
+      case 2:
+        currentThread = new WashingProgram2(io, temp, water, spin);
         currentThread.start();
         break;
       case 3:
