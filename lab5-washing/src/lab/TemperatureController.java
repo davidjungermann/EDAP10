@@ -46,7 +46,7 @@ public class TemperatureController extends MessagingThread<WashingMessage> {
                 if (m.getCommand() == WashingMessage.TEMP_SET) {
                   temp = m.getValue();
                   upperBound = temp - mu;
-                  lowerBound = temp + ml;
+                  lowerBound = temp - ml;
                 } else {
                   io.heat(false);
                   break;
