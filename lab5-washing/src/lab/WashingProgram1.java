@@ -46,7 +46,7 @@ public class WashingProgram1 extends MessagingThread<WashingMessage> {
           i++;
           Thread.sleep(2 * 60000 / Wash.SPEEDUP);
           receive();
-          if(i == 5) {
+          if (i == 5) {
             i = 0;
             break;
           }
