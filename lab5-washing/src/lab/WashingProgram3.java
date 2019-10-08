@@ -45,7 +45,6 @@ class WashingProgram3 extends MessagingThread<WashingMessage> {
 
       // Unlock hatch
       io.lock(false);
-
       System.out.println("washing program 3 finished");
     } catch (InterruptedException e) {
 

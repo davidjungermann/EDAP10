@@ -39,13 +39,7 @@ public class Wash {
         currentThread = new WashingProgram3(io, temp, water, spin);
         currentThread.start();
         break;
-      default:
-        throw new Error("Faulty value");
       }
-
-      // TODO:
-      // if the user presses buttons 1-3, start a washing program
-      // if the user presses button 0, and a program has been started, stop it
     }
   }
 };
