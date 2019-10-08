@@ -26,7 +26,8 @@ public class WashingProgram1 extends MessagingThread<WashingMessage> {
       // temperature for 30 minutes, drain, rinse 5 times 2 minutes in cold water,
       // centrifuge for 5
       // minutes and unlock the hatch
-
+      
+      int i = 0;
       io.lock(true);
       water.send(new WashingMessage(this, WashingMessage.WATER_FILL, 10));
       spin.send(new WashingMessage(this, WashingMessage.SPIN_SLOW));
@@ -48,7 +49,6 @@ public class WashingProgram1 extends MessagingThread<WashingMessage> {
         }
       }
 
-      int i = 0;
       while (true) {
         water.send(new WashingMessage(this, WashingMessage.WATER_DRAIN));
         m = receive();
@@ -56,6 +56,7 @@ public class WashingProgram1 extends MessagingThread<WashingMessage> {
           water.send(new WashingMessage(this, WashingMessage.WATER_FILL, 10));
           i++;
           Thread.sleep(2 * 60000 / Wash.SPEEDUP);
+          receive();
           if (i == 5) {
             break;
           }

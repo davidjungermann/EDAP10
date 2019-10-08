@@ -21,6 +21,7 @@ public class WashingProgram2 extends MessagingThread<WashingMessage> {
   @Override
   public void run() {
     try {
+      int i = 0;
 
       // Lock the hatch, let water into the machine, heat to 40◦C, keep the
       // temperature for 30 minutes, drain, rinse 5 times 2 minutes in cold water,
@@ -55,8 +56,13 @@ public class WashingProgram2 extends MessagingThread<WashingMessage> {
         m = receive();
         if (m.getCommand() == WashingMessage.ACKNOWLEDGMENT && m.getSender() == water) {
           water.send(new WashingMessage(this, WashingMessage.WATER_FILL, 10));
+          i++;
           Thread.sleep(2 * 60000 / Wash.SPEEDUP);
-          break;
+          receive();
+          if(i == 5) {
+            i = 0;
+            break;
+          }
         }
       }
 
@@ -88,8 +94,13 @@ public class WashingProgram2 extends MessagingThread<WashingMessage> {
         m = receive();
         if (m.getCommand() == WashingMessage.ACKNOWLEDGMENT && m.getSender() == water) {
           water.send(new WashingMessage(this, WashingMessage.WATER_FILL, 10));
+          i++;
           Thread.sleep(2 * 60000 / Wash.SPEEDUP);
-          break;
+          receive();
+          if(i == 5) {
+            i = 0;
+            break;
+          }
         }
       }
 
