@@ -54,7 +54,7 @@ public class TemperatureController extends MessagingThread<WashingMessage> {
               }
 
               currentTemp = io.getTemperature();
-              if (io.getWaterLevel() > 1) {
+              if (io.getWaterLevel() > 1) { // Check that there is water in machine. 
                 if (lowerBound >= currentTemp) {
                   io.heat(true);
                 } else if (upperBound <= currentTemp) {

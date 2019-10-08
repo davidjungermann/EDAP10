@@ -76,6 +76,7 @@ public class WaterController extends MessagingThread<WashingMessage> {
             break;
 
           case WashingMessage.WATER_DRAIN:
+            io.fill(false); // Can't drain if input is running. 
             io.drain(true);
             while (true) {
               m = receiveWithTimeout((long) ((((io.getWaterLevel() / 0.2) - 1) * 1000) / Wash.SPEEDUP));

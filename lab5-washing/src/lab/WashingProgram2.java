@@ -27,10 +27,10 @@ public class WashingProgram2 extends MessagingThread<WashingMessage> {
       // wash should be performed in 60◦C.
       io.lock(true);
       water.send(new WashingMessage(this, WashingMessage.WATER_FILL, 10));
-      spin.send(new WashingMessage(this, WashingMessage.SPIN_SLOW));
-
+      
       receive();
       temp.send(new WashingMessage(this, WashingMessage.TEMP_SET, 40));
+      spin.send(new WashingMessage(this, WashingMessage.SPIN_SLOW));
 
       receive();
       Thread.sleep(15 * 60000 / Wash.SPEEDUP);
@@ -56,10 +56,10 @@ public class WashingProgram2 extends MessagingThread<WashingMessage> {
 
       receive();
       water.send(new WashingMessage(this, WashingMessage.WATER_FILL, 10));
-      spin.send(new WashingMessage(this, WashingMessage.SPIN_SLOW));
 
       receive();
       temp.send(new WashingMessage(this, WashingMessage.TEMP_SET, 60));
+      spin.send(new WashingMessage(this, WashingMessage.SPIN_SLOW));
 
       receive();
       Thread.sleep(30 * 60000 / Wash.SPEEDUP);
