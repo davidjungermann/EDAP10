@@ -30,8 +30,15 @@ public class WashingProgram1 extends MessagingThread<WashingMessage> {
       io.lock(true);
       water.send(new WashingMessage(this, WashingMessage.WATER_FILL, 10));
       spin.send(new WashingMessage(this, WashingMessage.SPIN_SLOW));
-      temp.send(new WashingMessage(this, WashingMessage.TEMP_SET, 40));
-
+      
+      while(true) {
+         m = receive();
+         if(m.getCommand() == WashingMessage.ACKNOWLEDGMENT && m.getSender()  == water) {
+           temp.send(new WashingMessage(this, WashingMessage.TEMP_SET, 40));
+           break;
+         }
+      }
+      
       while (true) {
         m = receive();
         if (m.getCommand() == WashingMessage.ACKNOWLEDGMENT && m.getSender() == temp) {
@@ -40,18 +47,38 @@ public class WashingProgram1 extends MessagingThread<WashingMessage> {
           break;
         }
       }
-
-      while (true) {
-        water.send(new WashingMessage(this, WashingMessage.WATER_DRAIN, 10));
+      
+      int i = 0;
+      while(true) {
+        water.send(new WashingMessage(this, WashingMessage.WATER_DRAIN));
         m = receive();
-        if (m.getCommand() == WashingMessage.ACKNOWLEDGMENT && m.getSender() == water) {
+        if(m.getCommand() == WashingMessage.ACKNOWLEDGMENT && m.getSender() == water) {
           water.send(new WashingMessage(this, WashingMessage.WATER_FILL, 10));
+          i++;
           Thread.sleep(2 * 60000 / Wash.SPEEDUP);
-          water.send(new WashingMessage(this, WashingMessage.WATER_DRAIN, 10));
-          break;
+          System.out.println(i);
+          if(i == 5) {
+            break; 
+          }
         }
       }
-
+      
+      water.send(new WashingMessage(this, WashingMessage.WATER_DRAIN));
+      
+      
+       
+//
+//      while (true) {
+//        m = receive();
+//        if (m.getCommand() == WashingMessage.ACKNOWLEDGMENT && m.getSender() == water) {
+//          water.send(new WashingMessage(this, WashingMessage.WATER_FILL, 10));
+//          Thread.sleep(2 * 60000 / Wash.SPEEDUP);
+//          break;
+//        }
+//      }
+//      
+//      water.send(new WashingMessage(this, WashingMessage.WATER_DRAIN, 10));
+//
       while (true) {
         m = receive();
         if (m.getCommand() == WashingMessage.ACKNOWLEDGMENT && m.getSender() == water) {
