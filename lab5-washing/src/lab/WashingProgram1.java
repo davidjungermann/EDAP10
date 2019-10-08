@@ -21,34 +21,23 @@ public class WashingProgram1 extends MessagingThread<WashingMessage> {
   @Override
   public void run() {
     try {
-
       // Lock the hatch, let water into the machine, heat to 40◦C, keep the
       // temperature for 30 minutes, drain, rinse 5 times 2 minutes in cold water,
       // centrifuge for 5
       // minutes and unlock the hatch
       
-      int i = 0;
       io.lock(true);
       water.send(new WashingMessage(this, WashingMessage.WATER_FILL, 10));
+      
+      receive();
+      temp.send(new WashingMessage(this, WashingMessage.TEMP_SET, 40));
       spin.send(new WashingMessage(this, WashingMessage.SPIN_SLOW));
 
-      while (true) {
-        m = receive();
-        if (m.getCommand() == WashingMessage.ACKNOWLEDGMENT && m.getSender() == water) {
-          temp.send(new WashingMessage(this, WashingMessage.TEMP_SET, 40));
-          break;
-        }
-      }
-
-      while (true) {
-        m = receive();
-        if (m.getCommand() == WashingMessage.ACKNOWLEDGMENT && m.getSender() == temp) {
-          Thread.sleep(30 * 60000 / Wash.SPEEDUP);
-          temp.send(new WashingMessage(this, WashingMessage.TEMP_IDLE));
-          break;
-        }
-      }
-
+      receive();
+      Thread.sleep(30 * 60000 / Wash.SPEEDUP);
+      temp.send(new WashingMessage(this, WashingMessage.TEMP_IDLE));
+      
+      int i = 0;
       while (true) {
         water.send(new WashingMessage(this, WashingMessage.WATER_DRAIN));
         m = receive();
@@ -57,22 +46,19 @@ public class WashingProgram1 extends MessagingThread<WashingMessage> {
           i++;
           Thread.sleep(2 * 60000 / Wash.SPEEDUP);
           receive();
-          if (i == 5) {
+          if(i == 5) {
+            i = 0;
             break;
           }
         }
       }
-
+      
       water.send(new WashingMessage(this, WashingMessage.WATER_DRAIN));
+      receive();
+      
+      spin.send(new WashingMessage(this, WashingMessage.SPIN_FAST));
+      Thread.sleep(5 * 60000 / Wash.SPEEDUP);
 
-      while (true) {
-        m = receive();
-        if (m.getCommand() == WashingMessage.ACKNOWLEDGMENT && m.getSender() == water) {
-          spin.send(new WashingMessage(this, WashingMessage.SPIN_FAST));
-          Thread.sleep(5 * 60000 / Wash.SPEEDUP);
-          break;
-        }
-      }
       spin.send(new WashingMessage(this, WashingMessage.SPIN_OFF));
       io.lock(false);
       System.out.println("washing program 1 finished");
