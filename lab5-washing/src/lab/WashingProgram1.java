@@ -28,6 +28,7 @@ public class WashingProgram1 extends MessagingThread<WashingMessage> {
 			Thread.sleep(5 * 60000 / Wash.SPEEDUP);
 			// instruct SpinController to stop spin barrel spin
 			spin.send(new WashingMessage(this, WashingMessage.SPIN_OFF));
+			
 		} catch (InterruptedException e) {
 
 			// if we end up here, it means the program was interrupt()'ed
