@@ -1,11 +1,11 @@
 package messagingtest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 class MessagingTest {
 

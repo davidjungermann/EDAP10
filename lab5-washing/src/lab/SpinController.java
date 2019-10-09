@@ -42,9 +42,11 @@ public class SpinController extends MessagingThread<WashingMessage> {
             }
           }
           if (m.getCommand() == WashingMessage.SPIN_FAST) {
-            io.setSpinMode(SPIN_FAST);
-            m = null;
-            break;
+            if(io.getWaterLevel() < 1) { // Check that there is no water before centrifuging. 
+              io.setSpinMode(SPIN_FAST);
+              m = null;
+              break;
+            }
           }
 
         }
