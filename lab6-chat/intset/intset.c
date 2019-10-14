@@ -9,6 +9,7 @@
 /*
  * Set implemented using closed hashing.
  */
+pthread_mutex_t mutex;
 
 struct intset {
   int size;
@@ -39,6 +40,7 @@ intset_create()
     s->data[i] = EMPTY_SLOT;
   }
 
+  pthread_mutex_init(&mutex, NULL);
   return s;
 }
 
@@ -78,6 +80,7 @@ find(struct intset *s, int a)
 bool
 intset_add(struct intset *s, int a)
 {
+  pthread_mutex_lock(&mutex);
   // rehash if more than 70% is used
   if (s->size >= s->allocated * 7 / 10) {
     int old_allocated = s->allocated;
@@ -109,12 +112,13 @@ intset_add(struct intset *s, int a)
 
   int idx = find(s, a);
   if (s->data[idx] == a) {
+    pthread_mutex_unlock(&mutex);
     return false;
   }
 
   s->data[idx] = a;
   s->size++;
-
+  pthread_mutex_unlock(&mutex);
   return true;
 }
 
@@ -123,10 +127,11 @@ intset_add(struct intset *s, int a)
 bool
 intset_contains(struct intset *s, int a)
 {
+  pthread_mutex_lock(&mutex);
   // use private helper function above
   int idx = find(s, a);
   bool found = (s->data[idx] == a);
-
+  pthread_mutex_unlock(&mutex);
   return found;
 }
 
@@ -135,7 +140,8 @@ intset_contains(struct intset *s, int a)
 int
 intset_size(struct intset *s)
 {
+  pthread_mutex_lock(&mutex);
   int sz = s->size;
-
+  pthread_mutex_unlock(&mutex);
   return sz;
 }
