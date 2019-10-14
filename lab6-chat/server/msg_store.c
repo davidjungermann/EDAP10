@@ -147,7 +147,6 @@ msg_store_poll_topic(struct msg_store *store,
   }
   pthread_mutex_unlock(&mutex);
   pthread_cond_broadcast(&cond);
-
   return available;
 }
 
@@ -162,7 +161,6 @@ msg_store_poll_message(struct msg_store *store,
                        char **text)
 {
   pthread_mutex_lock(&mutex);
-
   bool available = any_message_available(store, client)
                    && (client->current_topic_id >= 0)
                    && (client->current_topic_id < list_size(store->topics));
@@ -197,7 +195,6 @@ msg_store_init_client(struct msg_store *store,
   client->last_topic_published = -1;     // force update
   pthread_mutex_unlock(&mutex);
   pthread_cond_broadcast(&cond);
-
 }
 
 // ----------------------------------------------------------------------------
@@ -228,14 +225,16 @@ msg_store_await_message_or_topic(struct msg_store *store,
   //
   // -- Jim Hacker
   //
-
+  pthread_mutex_lock(&mutex);
   while (! any_topic_available(store, client)
       && ! any_message_available(store, client))
   {
+  pthread_cond_broadcast(&cond);
   pthread_cond_wait(&cond, &mutex);
   }
 
   int reading_state = client->current_topic_id;
-
+  pthread_mutex_unlock(&mutex);
+  pthread_cond_broadcast(&cond);
   return reading_state;
 }
