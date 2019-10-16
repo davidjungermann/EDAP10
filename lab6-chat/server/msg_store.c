@@ -31,6 +31,7 @@ any_topic_available(struct msg_store *store,
                     struct client_state *client)
 {
   int last_topic_available = list_size(store->topics) - 1;
+  pthread_cond_broadcast(&cond);
   return (client->last_topic_published < last_topic_available);
 }
 
@@ -45,18 +46,22 @@ any_message_available(struct msg_store *store,
   int topic_id = client->current_topic_id;
   switch (topic_id) {
     case TOPIC_STATE_NO_TOPIC:
+      // pthread_cond_broadcast(&cond);
       return false;
     case TOPIC_STATE_LOGOUT_REQUESTED:
     case TOPIC_STATE_DISCONNECTED:
       // return true in this case, to break out of the loop
       // in msg_store_await_message_or_topic below
+      // pthread_cond_broadcast(&cond);
       return true;
     default:
       if (topic_id < list_size(store->topics)) {
         struct list *topic = list_get(store->topics, topic_id);
         int last_message_available = list_size(topic) - 1;
+        // pthread_cond_broadcast(&cond);
         return (client->last_message_published < last_message_available);
       } else {
+        // pthread_cond_broadcast(&cond);
         return false;
       }
   }
@@ -184,7 +189,6 @@ msg_store_init_client(struct msg_store *store,
                       struct client_state *client)
 {
   pthread_mutex_lock(&mutex);
-
   client->current_topic_id = TOPIC_STATE_NO_TOPIC;
   client->last_topic_published = -1;     // force update
   pthread_mutex_unlock(&mutex);
@@ -210,7 +214,6 @@ msg_store_select_topic(struct msg_store *store,
 int
 msg_store_await_message_or_topic(struct msg_store *store,
                                  struct client_state *client)
-
 {
   pthread_mutex_lock(&mutex);
   while (! any_topic_available(store, client)

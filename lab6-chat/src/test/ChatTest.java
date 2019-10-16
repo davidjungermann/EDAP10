@@ -61,6 +61,7 @@ class ChatTest {
         for (Twit t : twits) {
             t.join();
         }
+        Thread.sleep(1000);
         ChatLog.expect(NBR_TWITS, NBR_TWITS * NBR_MESSAGES);
     }
 }

@@ -81,6 +81,7 @@ main()
     fail_if(child_process < 0, "fork");
 
     if (child_process == 0) {
+      signal(SIGINT, SIG_DFL);
       run_server();
     } else {
       // SIGINT (ctrl-C) will automatically be sent to both parent and child.
